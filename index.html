@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Семейные очки</title><style>*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f5f7fb;color:#182033}header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #e7eaf0;padding:14px 5%;display:flex;gap:25px;align-items:center;justify-content:space-between}.brand{font-weight:800;font-size:20px}nav{display:flex;gap:7px;flex-wrap:wrap}button{border:0;border-radius:10px;padding:10px 14px;background:#eef1f7;color:#182033;cursor:pointer;font-weight:650}button:hover{filter:brightness(.96)}main{max-width:1150px;margin:auto;padding:35px 20px}.page{display:none}.page.active{display:block}.hero{background:linear-gradient(135deg,#6d5dfc,#8c7cff);color:#fff;border-radius:24px;padding:35px;display:flex;justify-content:space-between;gap:25px;align-items:center}.hero h1{font-size:38px;max-width:700px;margin:8px 0}.eyebrow{text-transform:uppercase;letter-spacing:2px;opacity:.8}.points-card{background:#ffffff22;border:1px solid #ffffff44;padding:25px;border-radius:18px;min-width:160px;text-align:center}.points-card strong{display:block;font-size:42px;margin-top:5px}.notice{margin:20px 0;background:#fff8df;border:1px solid #f1dda1;padding:18px 22px;border-radius:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}.card{background:#fff;border:1px solid #e6e9ef;border-radius:18px;padding:22px;box-shadow:0 5px 18px #1820330b}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.task,.penalty,.urgent{padding:20px;background:#fff;border:1px solid #e4e7ed;border-radius:16px}.task h3,.penalty h3{margin-top:0}.reward{font-size:24px;font-weight:800;margin:12px 0;color:#4c3de7}.section-head{margin-bottom:20px}.section-head h2{font-size:30px;margin-bottom:5px}.chat{min-height:450px}.msg{padding:10px 13px;margin:8px 0;background:#f0f2f7;border-radius:12px}.chatbox{display:flex;gap:8px;margin-top:20px}.chatbox input{flex:1}input,textarea{width:100%;padding:12px;margin:7px 0;border:1px solid #dce0e8;border-radius:10px;font:inherit}textarea{min-height:90px}label{display:block;margin-top:10px;font-weight:650}.profile{max-width:500px;margin:auto;text-align:center}.avatar{width:100px;height:100px;border-radius:50%;background:#eef1f7;display:grid;place-items:center;font-size:45px;margin:0 auto 12px;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.bigpoints{padding:18px;background:#f4f2ff;border-radius:14px;margin:18px 0}.bigpoints b{display:block;font-size:35px;color:#4c3de7}.rank{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #eee}.rank:last-child{border:0}footer{text-align:center;color:#7b8293;padding:30px}@media(max-width:700px){header{align-items:flex-start;flex-direction:column}.hero{flex-direction:column}.hero h1{font-size:29px}.grid{grid-template-columns:1fr}.points-card{width:100%}}
+
+/* V3.0 Part 1 additions — original design preserved */
+.urgent{background:#ffe3e3!important;border:2px solid #ef4444!important;color:#8b1e1e}
+.v3-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eee}.v3-grow{flex:1}.v3-avatar{width:38px;height:38px;border-radius:50%;background:#eef1f7;display:grid;place-items:center;overflow:hidden}.v3-avatar img{width:100%;height:100%;object-fit:cover}
+.v3-modal{position:fixed;inset:0;background:#18203399;display:none;align-items:center;justify-content:center;z-index:100;padding:20px}.v3-modal.show{display:flex}.v3-modal-card{background:#fff;border-radius:20px;padding:24px;width:min(520px,100%);box-shadow:0 20px 60px #18203344}
+.v3-timer{font-weight:800;margin-top:8px}.v3-danger{background:#ffe8e8!important;color:#a51d2d!important}
+</style>
+</head>
+<body>
+<div id="v3RegisterModal" class="v3-modal"><div class="v3-modal-card">
+<h2>👋 Добро пожаловать!</h2><p>Зарегистрируйся — новый участник сразу попадёт в таблицу лидеров.</p>
+<label>Имя<input id="v3RegName" placeholder="Имя"></label>
+<label>Фамилия<input id="v3RegSurname" placeholder="Фамилия"></label>
+<label>Email<input id="v3RegEmail" type="email" placeholder="email@example.com"></label>
+<button onclick="v3Register()">Зарегистрироваться</button>
+</div></div>
+<header><div class="brand">🏠 Семейные очки</div><nav>
+<button onclick="show('home')">Главная</button><button onclick="show('tasks')">Задания</button><button onclick="show('penalties')">Наказания</button><button onclick="show('chat')">Чат</button><button onclick="show('profile')">Профиль</button><button id="adminBtn" onclick="show('admin')">👑 Админ</button>
+</nav></header>
+<main>
+<section id="home" class="page active">
+<div class="hero"><div><p class="eyebrow">Семейная система</p><h1>Соревнуйтесь, помогайте и зарабатывайте очки ⭐</h1><p>Выполняйте задания, следите за рейтингом и копите очки всей семьёй.</p></div><div class="points-card"><span>Мои очки</span><strong id="myPoints">0</strong></div></div>
+<div class="notice"><b>📢 Объявление</b><p id="notice">Здесь администратор сможет написать важное сообщение.</p></div>
+<div class="card" style="margin-top:20px"><h2>📖 Таймер для чтения</h2><p>Таймер запускается администратором.</p><div id="v3HomeReadTimer"></div></div><div class="grid"><div class="card"><h2>🏆 Таблица лидеров</h2><div id="leaderboard"></div></div><div class="card"><h2>📅 Расписание</h2><p id="schedule">Администратор пока ничего не добавил.</p></div></div>
+</section>
+<section id="tasks" class="page"><div class="section-head"><h2>⭐ Задания</h2><p>Выполняйте задания и получайте очки.</p></div><div id="taskList" class="cards"></div></section>
+<section id="penalties" class="page"><div class="section-head"><h2>⚠️ Наказания</h2><p>Очки можно использовать для погашения наказаний.</p></div><div id="penaltyList" class="cards"></div></section>
+<section id="chat" class="page"><div class="section-head"><h2>💬 Семейный чат</h2></div><div class="chat card"><div id="messages"></div><div class="chatbox"><input id="chatInput" placeholder="Напишите сообщение..."><button onclick="sendMessage()">Отправить</button></div></div></section>
+<section id="profile" class="page"><div class="profile card"><div class="avatar" id="avatar">👤</div><h2 id="profileName">Марк</h2><p id="profileEmail">demo@example.com</p><div class="bigpoints"><span>Очки</span><b id="profilePoints">0</b></div><label>Имя<input id="nameInput" value="Марк"></label><label>Фамилия<input id="surnameInput" placeholder="Ваша фамилия"></label><label>Аватар (ссылка)<input id="avatarInput" placeholder="https://..."></label><button onclick="saveProfile()">Сохранить профиль</button></div></section>
+<section id="admin" class="page"><div class="section-head"><h2>👑 Панель администратора</h2><p>Демо-панель. В реальной версии права будут проверяться сервером.</p></div>
+<div class="grid"><div class="card"><h3>📢 Объявление</h3><textarea id="noticeInput"></textarea><button onclick="saveNotice()">Опубликовать</button></div>
+<div class="card"><h3>📅 Расписание</h3><textarea id="scheduleInput"></textarea><button onclick="saveSchedule()">Сохранить</button></div></div>
+<div class="card"><h3>➕ Добавить задание</h3><input id="newTask" placeholder="Название задания"><input id="newTaskPoints" type="number" placeholder="Очки"><button onclick="addTask()">Добавить</button></div>
+<div class="card"><h3>⚡ Срочное задание</h3><input id="urgentTask" placeholder="Что нужно сделать?"><input id="urgentPoints" type="number" placeholder="Очки"><button onclick="addUrgent()">Создать</button><div id="urgentList"></div></div>
+
+<div id="v3AdminAdditions" class="grid" style="display:none">
+ <div class="card"><h3>👥 Участники группы</h3><div id="v3People"></div></div>
+ <div class="card"><h3>⚠️ Назначить наказание</h3>
+  <select id="v3PenaltyUser"></select>
+  <input id="v3PenaltyTitle" placeholder="За что наказание?">
+  <input id="v3PenaltyCost" type="number" min="1" placeholder="Штраф в очках">
+  <label>Срок оплаты<input id="v3PenaltyDue" type="datetime-local"></label>
+  <button onclick="v3CreatePenalty()">Назначить</button>
+ </div>
+ <div class="card"><h3>📖 Таймер для чтения</h3>
+  <input id="v3ReadMinutes" type="number" min="1" placeholder="Минуты">
+  <button onclick="v3StartReading()">Запустить таймер</button><div id="v3ReadTimer"></div>
+ </div>
+</div>
+</section>
+</main>
+<footer>Семейные очки · первая версия</footer>
+<script>
+const KEY='family_points_demo_v2';
+const OWNER_ID=1;
+
+const initial={
+ users:[
+  {id:1,name:'Марк',surname:'',email:'demo@example.com',points:0,admin:true,avatar:''},
+  {id:2,name:'Алексей',surname:'',email:'alex@example.com',points:0,admin:false,avatar:''},
+  {id:3,name:'София',surname:'',email:'sofia@example.com',points:0,admin:false,avatar:''}
+ ],
+ tasks:[
+  {id:1,title:'Убрать комнату',points:20,deadline:null,createdBy:1},
+  {id:2,title:'Помыть посуду',points:15,deadline:null,createdBy:1},
+  {id:3,title:'Вынести мусор',points:10,deadline:null,createdBy:1}
+ ],
+ penalties:[{id:1,title:'Не выполнил обязанность',cost:30}],
+ urgent:[],
+ messages:[{name:'Система',text:'Добро пожаловать в семейный чат!'}],
+ notices:[],
+ notice:'Здесь администратор сможет написать важное сообщение.',
+ schedule:'Понедельник — уборка\nСреда — помощь по дому\nСуббота — семейный день',
+ submissions:[],
+ notifications:[]
+};
+
+let db=JSON.parse(localStorage.getItem(KEY)||JSON.stringify(initial));
+let me=db.users.find(u=>u.id===OWNER_ID)||db.users[0];
+
+function save(){localStorage.setItem(KEY,JSON.stringify(db));}
+function today(){return new Date().toISOString().slice(0,10);}
+function userName(id){const u=db.users.find(x=>x.id===id);return u?(u.name+' '+(u.surname||'')).trim():'Неизвестный';}
+function notify(userId,text){
+ db.notifications.push({id:Date.now()+Math.random(),userId,text,read:false,date:new Date().toLocaleString('ru-RU')});
+}
+function addPoints(userId,n){
+ const u=db.users.find(x=>x.id===userId);
+ if(u){u.points+=n;}
+}
+function render(){
+ me=db.users.find(u=>u.id===OWNER_ID)||db.users[0];
+
+ document.getElementById('myPoints').textContent=me.points;
+ document.getElementById('profilePoints').textContent=me.points;
+ document.getElementById('profileName').textContent=(me.name+' '+(me.surname||'')).trim();
+ document.getElementById('profileEmail').textContent=me.email;
+ document.getElementById('notice').textContent=db.notice;
+ document.getElementById('schedule').innerHTML=db.schedule.replace(/\n/g,'<br>');
+ document.getElementById('adminBtn').style.display=me.admin?'inline-block':'none';
+
+ document.getElementById('leaderboard').innerHTML=[...db.users].sort((a,b)=>b.points-a.points)
+ .map((u,i)=>`<div class="rank"><span>${i+1}. ${u.name} ${u.surname||''}${u.admin?' 👑':''}</span><b>${u.points} ⭐</b></div>`).join('');
+
+ // Today's completed tasks leaderboard
+ const counts={};
+ db.submissions.filter(s=>s.status==='approved'&&s.approvedDate===today()).forEach(s=>{
+   counts[s.userId]=(counts[s.userId]||0)+1;
+ });
+ const todayRows=[...db.users].map(u=>({u,count:counts[u.id]||0})).sort((a,b)=>b.count-a.count);
+ const todayBox=document.getElementById('todayTasks');
+ if(todayBox) todayBox.innerHTML=todayRows.map((x,i)=>
+   `<div class="rank"><span>${i+1}. ${x.u.name} ${x.u.surname||''}</span><b>${x.count} заданий</b></div>`).join('');
+
+ document.getElementById('taskList').innerHTML=db.tasks.map(t=>{
+   const mine=db.submissions.find(s=>s.taskId===t.id&&s.userId===me.id&&s.status==='pending');
+   const done=db.submissions.find(s=>s.taskId===t.id&&s.userId===me.id&&s.status==='approved');
+   const overdue=t.deadline && new Date(t.deadline)<new Date() && !done;
+   return `<div class="task"><h3>${t.title}</h3>
+   <div class="reward">+${t.points} ⭐</div>
+   <p>${t.deadline?'Выполнить до: '+new Date(t.deadline).toLocaleString('ru-RU'):'Без срока'}</p>
+   ${done?'<b>✅ Выполнено и подтверждено</b>':
+     mine?'<b>🕐 Отправлено админу на проверку</b>':
+     overdue?'<b>⏰ Срок истёк</b>':
+     `<button onclick="completeTask(${t.id})">Выполнил</button>`}</div>`;
+ }).join('');
+
+ document.getElementById('penaltyList').innerHTML=db.penalties.map(p=>
+   `<div class="penalty"><h3>${p.title}</h3><div class="reward">−${p.cost} ⭐</div><button onclick="payPenalty(${p.id})">Погасить</button></div>`).join('');
+
+ document.getElementById('messages').innerHTML=db.messages.map(m=>
+   `<div class="msg"><b>${m.name}</b>: ${m.text}</div>`).join('');
+
+ document.getElementById('urgentList').innerHTML=db.urgent.map(u=>
+   `<div class="urgent"><b>🚨 ${u.title}</b> — +${u.points} ⭐</div>`).join('');
+
+ const notif=db.notifications.filter(n=>n.userId===me.id&&!n.read);
+ let notificationBox=document.getElementById('siteNotifications');
+ if(notificationBox) notificationBox.innerHTML=notif.length
+ ? `<b>🔔 Уведомления (${notif.length})</b>${notif.map(n=>`<div class="msg">${n.text}<small> · ${n.date}</small></div>`).join('')}<button onclick="readNotifications()">Отметить прочитанными</button>`
+ : '<b>🔔 Уведомления</b><p>Новых уведомлений нет.</p>';
+
+ const pending=document.getElementById('pendingTasks');
+ if(pending) pending.innerHTML=db.submissions.filter(s=>s.status==='pending').map(s=>{
+   const t=db.tasks.find(x=>x.id===s.taskId);
+   return `<div class="task"><b>${userName(s.userId)}</b> выполнил: <b>${t?t.title:'Удалённое задание'}</b>
+   <p>Отправлено: ${s.submittedDate}</p>
+   <button onclick="approveTask(${s.id})">✅ Подтвердить и начислить</button>
+   <button onclick="rejectTask(${s.id})">❌ Отклонить</button></div>`;
+ }).join('')||'<p>Нет заданий, ожидающих подтверждения.</p>';
+
+ const people=document.getElementById('peopleAdmin');
+ if(people) people.innerHTML=db.users.map(u=>
+   `<div class="rank"><span>${u.name} ${u.surname||''} — ${u.points} ⭐ ${u.admin?'👑 Админ':''}</span>
+   ${u.id!==OWNER_ID?`<button onclick="toggleAdmin(${u.id})">${u.admin?'Снять админа':'Назначить админом'}</button>
+   <button onclick="removePoints(${u.id})">Снять очки</button>`:''}</div>`).join('');
+
+ document.getElementById('noticeInput').value=db.notice;
+ document.getElementById('scheduleInput').value=db.schedule;
+ document.getElementById('nameInput').value=me.name;
+ document.getElementById('surnameInput').value=me.surname||'';
+ document.getElementById('avatarInput').value=me.avatar||'';
+ document.getElementById('avatar').innerHTML=me.avatar?`<img src="${me.avatar}" alt="Аватар">`:'👤';
+}
+
+function show(id){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ render();
+}
+function completeTask(id){
+ const t=db.tasks.find(x=>x.id===id);
+ if(!t)return;
+ if(db.submissions.some(s=>s.taskId===id&&s.userId===me.id&&(s.status==='pending'||s.status==='approved'))) return alert('Ты уже отправлял это задание.');
+ db.submissions.push({id:Date.now(),taskId:id,userId:me.id,status:'pending',submittedDate:new Date().toLocaleString('ru-RU'),approvedDate:null});
+ db.users.filter(u=>u.admin).forEach(a=>notify(a.id,`🔔 ${userName(me.id)} сообщил о выполнении задания «${t.title}». Нужно подтвердить.`));
+ save();render();alert('Задание отправлено админу. Очки будут начислены только после подтверждения.');
+}
+function approveTask(id){
+ if(!me.admin)return alert('Нет прав администратора.');
+ const s=db.submissions.find(x=>x.id===id); if(!s)return;
+ const t=db.tasks.find(x=>x.id===s.taskId); if(!t)return;
+ s.status='approved';s.approvedDate=today();addPoints(s.userId,t.points);
+ notify(s.userId,`✅ Администратор подтвердил задание «${t.title}». Тебе начислено +${t.points} очков.`);
+ save();render();
+}
+function rejectTask(id){
+ if(!me.admin)return alert('Нет прав администратора.');
+ const s=db.submissions.find(x=>x.id===id);if(!s)return;
+ s.status='rejected';
+ notify(s.userId,'❌ Администратор отклонил выполнение задания.');
+ save();render();
+}
+function payPenalty(id){
+ const p=db.penalties.find(x=>x.id===id);
+ if(me.points<p.cost)return alert('Недостаточно очков.');
+ me.points-=p.cost;notify(me.id,`⚠️ Наказание «${p.title}» погашено за ${p.cost} очков.`);
+ save();render();
+}
+function sendMessage(){
+ const i=document.getElementById('chatInput'),v=i.value.trim();if(!v)return;
+ db.messages.push({name:userName(me.id),text:v});i.value='';save();render();
+}
+function saveProfile(){
+ me.name=document.getElementById('nameInput').value.trim()||me.name;
+ me.surname=document.getElementById('surnameInput').value.trim();
+ me.avatar=document.getElementById('avatarInput').value.trim();
+ save();render();alert('Профиль сохранён');
+}
+function saveNotice(){db.notice=document.getElementById('noticeInput').value;save();render();alert('Объявление опубликовано');}
+function saveSchedule(){db.schedule=document.getElementById('scheduleInput').value;save();render();alert('Расписание сохранено');}
+function addTask(){
+ let title=document.getElementById('newTask').value.trim(),points=Number(document.getElementById('newTaskPoints').value);
+ let deadline=document.getElementById('newTaskDeadline')?.value||'';
+ if(!title||!points)return alert('Заполните название и очки');
+ db.tasks.push({id:Date.now(),title,points,deadline:deadline?new Date(deadline).toISOString():null,createdBy:me.id});
+ db.users.filter(u=>u.id!==me.id).forEach(u=>notify(u.id,`⭐ Новое задание: «${title}» (+${points} очков).`));
+ document.getElementById('newTask').value='';document.getElementById('newTaskPoints').value='';
+ if(document.getElementById('newTaskDeadline'))document.getElementById('newTaskDeadline').value='';
+ save();render();
+}
+function addUrgent(){
+ let title=document.getElementById('urgentTask').value.trim(),points=Number(document.getElementById('urgentPoints').value);
+ if(!title||!points)return alert('Заполните задание и очки');
+ db.urgent.push({id:Date.now(),title,points});
+ db.users.filter(u=>u.id!==me.id).forEach(u=>notify(u.id,`🚨 Срочное задание: «${title}». Награда: +${points} очков.`));
+ document.getElementById('urgentTask').value='';document.getElementById('urgentPoints').value='';save();render();
+}
+function toggleAdmin(id){
+ if(me.id!==OWNER_ID)return alert('Только владелец сайта может назначать админов.');
+ const u=db.users.find(x=>x.id===id);if(!u)return;
+ u.admin=!u.admin;notify(u.id,u.admin?'👑 Ты назначен администратором.':'ℹ️ Права администратора сняты.');
+ save();render();
+}
+function removePoints(id){
+ if(me.id!==OWNER_ID)return alert('Только владелец сайта может снимать очки этим способом.');
+ const amount=Number(prompt('Сколько очков снять?','10'));if(!Number.isFinite(amount)||amount<=0)return;
+ const u=db.users.find(x=>x.id===id);if(!u)return;
+ u.points-=amount;notify(id,`⚠️ Администратор снял с тебя ${amount} очков за невыполнение задания.`);
+ save();render();
+}
+function readNotifications(){
+ db.notifications.filter(n=>n.userId===me.id).forEach(n=>n.read=true);save();render();
+}
+
+// Admin deadline helper: add fields into the existing admin card without changing the design.
+const taskCard=document.querySelector('#admin .card:nth-of-type(3)');
+if(taskCard && !document.getElementById('newTaskDeadline')){
+ const input=document.createElement('input');
+ input.id='newTaskDeadline';input.type='datetime-local';input.title='Срок выполнения';
+ input.placeholder='Срок выполнения';
+ taskCard.insertBefore(input,taskCard.querySelector('button'));
+}
+
+// Add admin controls and notifications into existing page containers.
+const adminSection=document.getElementById('admin');
+if(adminSection){
+ const extras=document.createElement('div');
+ extras.innerHTML=`
+ <div class="card"><h3>🔔 Проверка выполненных заданий</h3><div id="pendingTasks"></div></div>
+ <div class="card"><h3>👥 Управление участниками</h3><div id="peopleAdmin"></div></div>`;
+ adminSection.appendChild(extras);
+}
+const home=document.getElementById('home');
+if(home){
+ const n=document.createElement('div');n.className='notice';n.id='siteNotifications';home.insertBefore(n,home.children[1]);
+ const g=document.querySelector('#home .grid');
+ if(g){
+  const c=document.createElement('div');c.className='card';c.innerHTML='<h2>🔥 Кто сегодня больше заданий выполнил</h2><div id="todayTasks"></div>';
+  g.appendChild(c);
+ }
+}
+
+/* ================= V3.0 PART 1 ================= */
+function v3Save(){localStorage.setItem(KEY,JSON.stringify(db));}
+function v3Ensure(){
+ db.notifications ||= []; db.readingTimers ||= []; db.penaltiesAssigned ||= [];
+ db.bans ||= []; db.mutes ||= []; db.warnings ||= [];
+ db.users ||= [];
+ db.users.forEach(u=>{u.admin=!!u.admin;u.avatar=u.avatar||'';});
+}
+v3Ensure();
+
+function v3Register(){
+ const name=document.getElementById('v3RegName').value.trim();
+ const surname=document.getElementById('v3RegSurname').value.trim();
+ const email=document.getElementById('v3RegEmail').value.trim().toLowerCase();
+ if(!name||!email)return alert('Заполни имя и email.');
+ if(db.users.some(u=>(u.email||'').toLowerCase()===email))return alert('Такой email уже зарегистрирован.');
+ const u={id:Date.now(),name,surname,email,points:0,admin:false,avatar:''};
+ db.users.push(u);
+ notify(u.id,'🎉 Регистрация завершена. Ты сразу добавлен в таблицу лидеров.');
+ v3Save();
+ document.getElementById('v3RegisterModal').classList.remove('show');
+ render();
+}
+
+function v3DeleteUser(id){
+ if(me.id!==OWNER_ID)return alert('Удалять участников может только владелец сайта.');
+ if(id===OWNER_ID)return alert('Владельца удалить нельзя.');
+ const u=db.users.find(x=>x.id===id); if(!u)return;
+ if(!confirm('Удалить '+userName(id)+' из группы?'))return;
+ db.users=db.users.filter(x=>x.id!==id);
+ db.submissions=db.submissions.filter(x=>x.userId!==id);
+ db.notifications=db.notifications.filter(x=>x.userId!==id);
+ db.penaltiesAssigned=db.penaltiesAssigned.filter(x=>x.userId!==id);
+ db.bans=db.bans.filter(x=>x.userId!==id);
+ db.mutes=db.mutes.filter(x=>x.userId!==id);
+ db.warnings=db.warnings.filter(x=>x.userId!==id);
+ v3Save();render();
+}
+
+function v3StartReading(){
+ const mins=Number(document.getElementById('v3ReadMinutes').value);
+ if(!Number.isFinite(mins)||mins<=0)return alert('Укажи количество минут.');
+ db.readingTimers.push({id:Date.now(),userId:me.id,endsAt:Date.now()+mins*60000,done:false});
+ v3Save();render();
+}
+function v3MarkReadingDone(id){
+ const t=db.readingTimers.find(x=>x.id===id&&x.userId===me.id);if(!t)return;
+ t.done=true;v3Save();render();
+}
+
+function v3CreatePenalty(){
+ if(!me.admin && me.id!==OWNER_ID)return alert('Нет прав.');
+ const uid=Number(document.getElementById('v3PenaltyUser').value);
+ const title=document.getElementById('v3PenaltyTitle').value.trim();
+ const cost=Number(document.getElementById('v3PenaltyCost').value);
+ const due=document.getElementById('v3PenaltyDue').value;
+ if(!uid||!title||cost<=0||!due)return alert('Заполни все поля.');
+ const p={id:Date.now(),userId:uid,title,cost,dueAt:new Date(due).getTime(),status:'open',createdBy:me.id};
+ db.penaltiesAssigned.push(p);
+ notify(uid,'⚠️ Тебе назначено наказание «'+title+'» на '+cost+' очков. Срок оплаты: '+new Date(p.dueAt).toLocaleString('ru-RU'));
+ v3Save();render();alert('Наказание назначено.');
+}
+function v3PayPenalty(id){
+ const p=db.penaltiesAssigned.find(x=>x.id===id&&x.userId===me.id);if(!p||p.status!=='open')return;
+ if(me.points<p.cost)return alert('Недостаточно очков.');
+ me.points-=p.cost;p.status='paid';p.paidAt=Date.now();
+ notify(me.id,'✅ Наказание «'+p.title+'» оплачено.');v3Save();render();
+}
+function v3ProcessPenalties(){
+ let changed=false;
+ db.penaltiesAssigned.forEach(p=>{
+  if(p.status==='open' && p.dueAt<=Date.now()){
+   p.status='overdue';
+   const u=db.users.find(x=>x.id===p.userId);
+   if(u){u.points-=p.cost;notify(u.id,'⏰ Срок оплаты наказания «'+p.title+'» истёк. Списано −'+p.cost+' очков.');}
+   changed=true;
+  }
+ });
+ if(changed)v3Save();
+}
+function v3Render(){
+ v3ProcessPenalties();
+ const isOwner=me.id===OWNER_ID, canAdmin=isOwner||!!me.admin;
+ const adminBtn=document.getElementById('adminBtn');
+ if(adminBtn)adminBtn.style.display=canAdmin?'inline-block':'none';
+ const add=document.getElementById('v3AdminAdditions'); if(add)add.style.display=canAdmin?'grid':'none';
+ const people=document.getElementById('v3People');
+ if(people)people.innerHTML=db.users.map(u=>{
+  const av=u.avatar?'<div class="v3-avatar"><img src="'+u.avatar+'"></div>':'<div class="v3-avatar">👤</div>';
+  const adminControls=u.id===OWNER_ID?'🏠 Владелец':
+   (isOwner?'<button onclick="toggleAdmin('+u.id+')">'+(u.admin?'Снять админа':'Назначить админом')+'</button>':'')+
+   (isOwner?'<button class="v3-danger" onclick="v3DeleteUser('+u.id+')">Удалить</button>':'');
+  return '<div class="v3-row">'+av+'<div class="v3-grow"><b>'+userName(u.id)+'</b><div>'+u.email+' · '+u.points+' ⭐ '+(u.admin?'👑 Админ':'')+'</div></div>'+adminControls+'</div>';
+ }).join('');
+ const sel=document.getElementById('v3PenaltyUser');
+ if(sel)sel.innerHTML=db.users.filter(u=>u.id!==OWNER_ID).map(u=>'<option value="'+u.id+'">'+userName(u.id)+'</option>').join('');
+ const mine=db.penaltiesAssigned.filter(p=>p.userId===me.id);
+ const pl=document.getElementById('penaltyList');
+ if(pl){
+  const base=db.penalties.map(p=>'<div class="penalty"><h3>'+p.title+'</h3><div class="reward">−'+p.cost+' ⭐</div><button onclick="payPenalty('+p.id+')">Погасить</button></div>').join('');
+  const own=mine.map(p=>'<div class="penalty"><h3>'+p.title+'</h3><div class="reward">−'+p.cost+' ⭐</div><p>Срок оплаты: '+new Date(p.dueAt).toLocaleString('ru-RU')+'</p><p>Статус: <b>'+p.status+'</b></p>'+(p.status==='open'?'<button onclick="v3PayPenalty('+p.id+')">Оплатить</button>':'')).join('');
+  pl.innerHTML=base+own;
+ }
+ const timers=db.readingTimers.filter(t=>t.userId===me.id&&!t.done);
+ const renderTimers=timers.map(t=>'<div class="v3-timer" data-end="'+t.endsAt+'">📖 Осталось: <span>--:--</span> <button onclick="v3MarkReadingDone('+t.id+')">Прочитал</button></div>').join('');
+ const a=document.getElementById('v3ReadTimer');if(a)a.innerHTML=renderTimers||'<p>Нет активного таймера.</p>';
+ const h=document.getElementById('v3HomeReadTimer');if(h)h.innerHTML=renderTimers||'<p>Нет активного таймера.</p>';
+ // Avatar icons in the existing leaderboard without changing its layout.
+ const lb=document.getElementById('leaderboard');
+ if(lb)lb.innerHTML=[...db.users].sort((a,b)=>b.points-a.points).map((u,i)=>'<div class="rank"><span style="display:flex;align-items:center;gap:8px">'+(u.avatar?'<span class="v3-avatar"><img src="'+u.avatar+'"></span>':'<span class="v3-avatar">👤</span>')+i+'. '+userName(u.id)+(u.admin?' 👑':'')+'</span><b>'+u.points+' ⭐</b></div>').join('');
+}
+function v3Tick(){
+ document.querySelectorAll('.v3-timer[data-end]').forEach(el=>{const left=Math.max(0,Number(el.dataset.end)-Date.now());const sec=Math.floor(left/1000),m=Math.floor(sec/60),s=sec%60;el.querySelector('span').textContent=m+':'+String(s).padStart(2,'0');});
+ v3ProcessPenalties();
+}
+setInterval(v3Tick,1000);
+
+render();
+v3Render();
+</script>
+</body></html>
